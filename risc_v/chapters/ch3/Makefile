@@ -1,10 +1,10 @@
 #####
 ## BUILD
 #####
-CC=riscv64-unknown-gcc
+CC=riscv64-unknown-elf-g++
 CFLAGS=-Wall -Wextra -pedantic -Wextra -O0 -g
 CFLAGS+=-static -ffreestanding -nostdlib -fno-rtti -fno-exceptions
-CFLAGS+=-march=rv64gc -mabi=lp64
+CFLAGS+=-march=rv64gc #-mabi=lp64
 INCLUDES=
 LINKER_SCRIPT=-Tsrc/lds/virt.lds
 TYPE=debug

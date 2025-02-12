@@ -2,17 +2,16 @@
 // Stephen Marz
 // 21 Sep 2019
 #![no_std]
-#![feature(panic_info_message,
-           asm,
-           allocator_api,
-           alloc_error_handler,
-           alloc_prelude,
-           const_raw_ptr_to_usize_cast)]
+#![feature(alloc_error_handler)]
+
+
+use core::arch::asm;
+use alloc::boxed::Box;
+use alloc::string::String;
 
 #[macro_use]
 extern crate alloc;
 // This is experimental and requires alloc_prelude as a feature
-use alloc::prelude::v1::*;
 
 // ///////////////////////////////////
 // / RUST MACROS
@@ -53,7 +52,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 		         "line {}, file {}: {}",
 		         p.line(),
 		         p.file(),
-		         info.message().unwrap()
+		         info.message()
 		);
 	}
 	else {
@@ -65,7 +64,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 extern "C" fn abort() -> ! {
 	loop {
 		unsafe {
-			asm!("wfi"::::"volatile");
+			asm!("wfi");
 		}
 	}
 }
@@ -288,7 +287,7 @@ extern "C" fn kmain() {
 	// deallocator
 	{
 		// We have the global allocator, so let's see if that works!
-		let k = Box::<u32>::new(100);
+		let k = Box::new(100);
 		println!("Boxed value = {}", *k);
 		kmem::print_table();
 		// The following comes from the Rust documentation:
