@@ -2,8 +2,8 @@
 // Stephen Marz
 // 21 Sep 2019
 #![no_std]
-#![feature(panic_info_message,asm)]
 
+use core::arch::asm;
 // ///////////////////////////////////
 // / RUST MACROS
 // ///////////////////////////////////
@@ -43,7 +43,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 				"line {}, file {}: {}",
 				p.line(),
 				p.file(),
-				info.message().unwrap()
+				info.message()
 				);
 	}
 	else {
@@ -56,7 +56,7 @@ extern "C"
 fn abort() -> ! {
 	loop {
 		unsafe {
-			asm!("wfi"::::"volatile");
+			asm!("wfi");
 		}
 	}
 }

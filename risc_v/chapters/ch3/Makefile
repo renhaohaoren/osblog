@@ -1,7 +1,7 @@
 #####
 ## BUILD
 #####
-CC=riscv64-unknown-linux-gnu-gcc
+CC=riscv64-unknown-gcc
 CFLAGS=-Wall -Wextra -pedantic -Wextra -O0 -g
 CFLAGS+=-static -ffreestanding -nostdlib -fno-rtti -fno-exceptions
 CFLAGS+=-march=rv64gc -mabi=lp64
