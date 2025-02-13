@@ -67,7 +67,7 @@ _start:
 	# 1 << 5     : Previous interrupt-enable bit is 1 (SPIE=1 [Enabled]).
 	# We set the "previous" bits because the mret will write the current bits
 	# with the previous bits.
-	li		t0, (0b01 << 11) | (1 << 7) | (1 << 5)
+	li		t0, (0b11 << 11) | (1 << 7) | (1 << 5)
 	csrw	mstatus, t0
 	# Machine's trap vector base address is set to `m_trap_vector`, for
 	# "machine" trap vector.
@@ -83,14 +83,16 @@ _start:
 	# mret, we will jump to kmain in supervisor mode.
 	la		t1, kmain
 	csrw	mepc, t1
+
 	# Setting `sie` (supervisor interrupt enable) register:
 	# This register takes the same bits as mideleg
 	# 1 << 1    : Supervisor software interrupt enable (SSIE=1 [Enabled])
 	# 1 << 5    : Supervisor timer interrupt enable (STIE=1 [Enabled])
 	# 1 << 9    : Supervisor external interrupt enable (SEIE=1 [Enabled])
 	# 0xaaa = MEIP/SEIP and MTIP/STIP and MSIP/SSIP
-	li		t2, 0x888
+	li		t2, 0x808
 	csrw	mie, t2
+	// wfi
 	mret
 3:
 
