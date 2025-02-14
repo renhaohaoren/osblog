@@ -2,18 +2,15 @@
 // Stephen Marz
 // 21 Sep 2019
 #![no_std]
-#![feature(panic_info_message,
-           asm,
-           allocator_api,
-           alloc_error_handler,
-           alloc_prelude,
-           const_raw_ptr_to_usize_cast)]
+#![feature(alloc_error_handler)]
 
 // #[macro_use]
 extern crate alloc;
-// This is experimental and requires alloc_prelude as a feature
-// use alloc::prelude::v1::*;
 
+use core::arch::asm;
+use alloc::boxed::Box;
+use alloc::string::String;
+use core::panic::PanicInfo;
 // ///////////////////////////////////
 // / RUST MACROS
 // ///////////////////////////////////
@@ -46,14 +43,14 @@ macro_rules! println
 extern "C" fn eh_personality() {}
 
 #[panic_handler]
-fn panic(info: &core::panic::PanicInfo) -> ! {
+fn panic(info: &PanicInfo) -> ! {
 	print!("Aborting: ");
 	if let Some(p) = info.location() {
 		println!(
 		         "line {}, file {}: {}",
 		         p.line(),
 		         p.file(),
-		         info.message().unwrap()
+		         info.message()
 		);
 	}
 	else {
@@ -65,7 +62,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 extern "C" fn abort() -> ! {
 	loop {
 		unsafe {
-			asm!("wfi"::::"volatile");
+			asm!("wfi");
 		}
 	}
 }

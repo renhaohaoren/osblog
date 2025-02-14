@@ -10,7 +10,7 @@ extern crate alloc;
 use core::arch::asm;
 use alloc::boxed::Box;
 use alloc::string::String;
-
+use core::panic::PanicInfo;
 // ///////////////////////////////////
 // / RUST MACROS
 // ///////////////////////////////////
@@ -43,7 +43,7 @@ macro_rules! println
 extern "C" fn eh_personality() {}
 
 #[panic_handler]
-fn panic(info: &core::panic::PanicInfo) -> ! {
+fn panic(info: &PanicInfo) -> ! {
 	print!("Aborting: ");
 	if let Some(p) = info.location() {
 		println!(
@@ -356,8 +356,8 @@ extern "C" fn kmain() {
 
 		// Let's cause a page fault and see what happens. This should trap
 		// to m_trap under trap.rs
-		let v = 0x0 as *mut u64;
-		v.write_volatile(0);
+		// let v = 0x0 as *mut u64;
+		// v.write_volatile(0);
 	}
 	// If we get here, the Box, vec, and String should all be freed since
 	// they go out of scope. This calls their "Drop" trait.
