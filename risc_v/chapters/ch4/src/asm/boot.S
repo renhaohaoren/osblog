@@ -10,7 +10,7 @@
 # starting address so that the entry _start is put at the RISC-V
 # address 0x8000_0000.
 .section .text.init
-
+.equ DATA_BASE,   0xffffffff
 # Execution starts here.
 .global _start
 _start:
@@ -58,16 +58,30 @@ _start:
 	# We use mret here so that the mstatus register is properly updated.
 	mret
 2:
+	li  t0, DATA_BASE  # Load the base address into t0
+
+	# Configure pmpaddr1 (assuming we use the second PMP entry)
+	csrw pmpaddr0, t0
+
+	# Configure pmpcfg0 for entry 1 (assuming entry 1 is the second one in pmpcfg0)
+	# Mode: NAPOT (11)
+	# Permissions: Read (1), Write (1), Execute (0) -> RW = 11 = 3
+	# pmpcfg0 bits for entry 1: [... (entry 0) | L|X|W|R|A1|A0 | ... (other entries)]
+	# Assuming each pmpcfg register controls 8 entries and each entry config is 8 bits
+	# Entry 1 starts at bit position 8 (8 bits * 1 entry offset)
+	li  t1, 0b00011111  # L=0, X=0, W=1, R=1, A=NAPOT(11)
+	// slli t1, t1, 8     # Shift left to position it for entry 1
+	csrw pmpcfg0, t1
+
 	# We set the return address (ra above) to this label. When kinit() is finished
 	# in Rust, it will return here.
-
 	# Setting `mstatus` (supervisor status) register:
 	# 0b01 << 11 : Previous protection mode is 1 (MPP=01 [Supervisor]).
 	# 1 << 7     : Previous machine interrupt-enable bit is 1 (MPIE=1 [Enabled])
 	# 1 << 5     : Previous interrupt-enable bit is 1 (SPIE=1 [Enabled]).
 	# We set the "previous" bits because the mret will write the current bits
 	# with the previous bits.
-	li		t0, (0b11 << 11) | (1 << 7) | (1 << 5)
+	li		t0, (0b01 << 11) | (1 << 7) | (1 << 5)
 	csrw	mstatus, t0
 	# Machine's trap vector base address is set to `m_trap_vector`, for
 	# "machine" trap vector.
