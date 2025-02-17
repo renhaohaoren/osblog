@@ -107,6 +107,7 @@ switch_to_user:
 	csrw	satp, a2
 	li		t1, 0xaaa
 	csrw	mie, t1
+	// wfi
 	la		t2, m_trap_vector
 	csrw	mtvec, t2
 	# This fence forces the MMU to flush the TLB. However, since

@@ -3,6 +3,8 @@
 // Stephen Marz
 // 10 October 2019
 
+use core::arch::asm;
+
 use crate::cpu::TrapFrame;
 use crate::{plic, uart};
 use crate::syscall::do_syscall;
@@ -61,9 +63,9 @@ extern "C" fn m_trap(epc: usize,
 				// This is much too slow for normal operations, but it gives us
 				// a visual of what's happening behind the scenes.
 				mtimecmp.write_volatile(mtime.read_volatile() + 10_000_000);
-				unsafe {
-					switch_to_user(frame, mepc, satp);
-				}
+
+				switch_to_user(frame, mepc, satp);
+
 			},
 			11 => {
 				// Machine external (interrupt from Platform Interrupt Controller (PLIC))
@@ -165,6 +167,12 @@ extern "C" fn m_trap(epc: usize,
 				// We need while trues here until we have a functioning "delete from scheduler"
 				while true {}
 				return_pc += 4;
+				loop {
+					
+					unsafe {
+						asm!("nop");
+					}				
+				}
 			},
 			_ => {
 				panic!("Unhandled sync trap CPU#{} -> {}\n", hart, cause_num);

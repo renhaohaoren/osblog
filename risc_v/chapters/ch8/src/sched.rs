@@ -3,7 +3,7 @@
 // Stephen Marz
 // 27 Dec 2019
 
-use crate::{process::{ProcessState, PROCESS_LIST}};
+use crate::process::{ProcessState, PROCESS_LIST};
 
 pub fn schedule() ->  (usize, usize, usize) {
 	unsafe {
