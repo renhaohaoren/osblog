@@ -1,10 +1,10 @@
 #####
 ## BUILD
 #####
-CC=riscv64-unknown-linux-gnu-gcc
+CC=riscv64-unknown-elf-g++
 CFLAGS=-Wall -Wextra -pedantic -Wextra -O0 -g
 CFLAGS+=-static -ffreestanding -nostdlib -fno-rtti -fno-exceptions
-CFLAGS+=-march=rv64gc -mabi=lp64
+CFLAGS+=-march=rv64gc #-mabi=lp64
 INCLUDES=
 LINKER_SCRIPT=-Tsrc/lds/virt.lds
 TYPE=debug
@@ -23,7 +23,7 @@ CPU=rv64
 CPUS=4
 MEM=128M
 DISK=hdd.dsk
-DRIVE= -drive if=none,format=raw,file=$(DISK),id=foo -device virtio-blk-device,scsi=off,drive=foo
+DRIVE= -drive if=none,format=raw,file=$(DISK),id=foo -device virtio-blk-device,drive=foo
 OPTS=-nographic -serial mon:stdio -bios none -device virtio-rng-device -device virtio-gpu-device
 OPTS+=-device virtio-net-device -device virtio-tablet-device -device virtio-keyboard-device
 #DRIVE=

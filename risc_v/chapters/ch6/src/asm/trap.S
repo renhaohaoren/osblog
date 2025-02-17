@@ -72,7 +72,7 @@ m_trap_vector:
 	mv		a5, t5
 	ld		sp, 520(a5)
 	call	m_trap
-
+	wfi
 	# When we get here, we've returned from m_trap, restore registers
 	# and return.
 	# m_trap will return the return address via a0.

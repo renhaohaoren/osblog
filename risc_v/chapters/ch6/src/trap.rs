@@ -3,6 +3,8 @@
 // Stephen Marz
 // 10 October 2019
 
+use core::arch::asm;
+
 use crate::cpu::TrapFrame;
 use crate::{plic, uart};
 
@@ -30,6 +32,7 @@ extern "C" fn m_trap(epc: usize,
 			false
 		}
 	};
+
 	// The cause contains the type of trap (sync, async) as well as the cause
 	// number. So, here we narrow down just the cause number.
 	let cause_num = cause & 0xfff;
@@ -47,6 +50,7 @@ extern "C" fn m_trap(epc: usize,
 				// process to run.
 				// Machine timer
 				println!("CTX");
+
 				let mtimecmp = 0x0200_4000 as *mut u64;
 				let mtime = 0x0200_bff8 as *const u64;
 				// The frequency given by QEMU is 10_000_000 Hz, so this sets
@@ -54,6 +58,12 @@ extern "C" fn m_trap(epc: usize,
 				// This is much too slow for normal operations, but it gives us
 				// a visual of what's happening behind the scenes.
 				mtimecmp.write_volatile(mtime.read_volatile() + 10_000_000);
+				// loop {
+					
+				// 	unsafe {
+				// 		asm!("nop");
+				// 	}				
+				// }					
 			},
 			11 => {
 				// Machine external (interrupt from Platform Interrupt Controller (PLIC))
@@ -147,6 +157,12 @@ extern "C" fn m_trap(epc: usize,
 				// Store page fault
 				println!("Store page fault CPU#{} -> 0x{:08x}: 0x{:08x}", hart, epc, tval);
 				return_pc += 4;
+				loop {
+					
+					unsafe {
+						asm!("nop");
+					}				
+				}
 			},
 			_ => {
 				panic!("Unhandled sync trap CPU#{} -> {}\n", hart, cause_num);

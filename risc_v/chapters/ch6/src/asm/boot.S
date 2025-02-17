@@ -72,6 +72,7 @@ _start:
 	li  t1, 0b00011111  # L=0, X=0, W=1, R=1, A=NAPOT(11)
 	// slli t1, t1, 8     # Shift left to position it for entry 1
 	csrw pmpcfg0, t1
+	
 
 	# We set the return address (ra above) to this label. When kinit() is finished
 	# in Rust, it will return here.
@@ -91,8 +92,9 @@ _start:
 	# Jump to first process. We put the MPP = 00 for user mode, so after
 	# mret, we will jump to the first process' addresss in user mode.
 	csrw	mepc, a0
-	li		t2, 0xaaa
+	li		t2, 0xa0a
 	csrw	mie, t2
+	// wfi
 	la		ra, 4f
 	mret
 3:
@@ -105,7 +107,7 @@ _start:
 	# where base address is 0x0200_0000 (MMIO CLINT base address)
 	# We only use additional harts to run user-space programs, although this may
 	# change.
-
+	
 	# We divide up the stack so the harts aren't clobbering one another.
 	la		sp, _stack_end
 	li		t0, 0x10000

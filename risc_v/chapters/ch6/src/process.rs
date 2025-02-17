@@ -172,6 +172,7 @@ impl Process {
 			pt = &mut *ret_proc.root;
 		}
 		let saddr = ret_proc.stack as usize;
+		println!("stack addr 0x{:x} 0x{:x} 0x{:x}", saddr, func_addr, ret_proc.root as usize);
 		// We need to map the stack onto the user process' virtual
 		// memory This gets a little hairy because we need to also map
 		// the function code too.
